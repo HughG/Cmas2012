@@ -14,6 +14,8 @@ for (i = 0; i < spokeCount; i++) {
   spokePath.add(origin);
   spokePath.add(origin + spoke);
   spoke.angle += (360 / spokeCount);
+  alert(spoke);
+  alert(spokePath);
 }
 
 ))();
