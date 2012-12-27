@@ -1,3 +1,8 @@
 ﻿#snowCanvas {
   background-color: black;
 }
+
+#nameForm {
+  width: 100%;
+  margin-bottom: 1em;
+}

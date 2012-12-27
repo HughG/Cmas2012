@@ -1,4 +1,4 @@
-(function () {
+function letItSnow() {
 
 // Seedable pseudo-random number generator, after http://stackoverflow.com/a/424445
 function RNG(seed) {
@@ -35,16 +35,26 @@ RNG.prototype.choice = function(array) {
   return array[this.nextRange(0, array.length)];
 }
 
+// String hash, after
+// http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+String.prototype.hashCode = function(){
+    var hash = 0, i, char;
+    if (this.length == 0) return hash;
+    for (i = 0; i < this.length; i++) {
+        char = this.charCodeAt(i);
+        hash = ((hash<<5)-hash)+char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+};
+
 var SPOKE_LENGTH = 100;
+var rng;
 
 function drawScene () {
   // Set up the canvas for paper.js.
   var canvas = document.getElementById('snowCanvas');
   paper.setup(canvas);
-
-  // Seed the RNG.
-  //var rng = new RNG(20);
-  var rng = new RNG(Math.random() * 100);
 
   // BEGIN Helper functions ----------------------------------------
   function drawSpoke (origin, spokeEnd, crossParams) {
@@ -128,7 +138,12 @@ function drawScene () {
   paper.view.draw();
 };
 
-$(document).ready(drawScene);
+// Seed the RNG.
+var name = document.forms.nameForm.name.value;
+// Add 1 to the hash, because 0 will cause the RNG to seed from Math.random(...).
+var nameHash = name.hashCode() + 1;
+rng = new RNG(Math.abs(nameHash));
 
-})();
+drawScene();
 
+};
