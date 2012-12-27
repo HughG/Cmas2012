@@ -1,3 +1,5 @@
+(function () {
+
 // Seedable pseudo-random number generator, from http://stackoverflow.com/a/424445
 function RNG(seed) {
   // LCG using GCC's constants
@@ -26,38 +28,48 @@ RNG.prototype.choice = function(array) {
   return array[this.nextRange(0, array.length)];
 }
 
-var makeSnowflake = function () {
-
-// Set up the canvas for paper.js.
-var canvas = document.getElementById('snowCanvas');
-paper.setup(canvas);
-
-// Seed the RNG.
-var rng = new RNG(20);
-
-// Draw the snowflake.
 var SPOKE_LENGTH = 100;
-var origin = new paper.Point(380, 210);
 
-var spoke = new paper.Point();
-spoke.length = 100;
-spoke.angle = 0;
+function drawScene () {
+  // Set up the canvas for paper.js.
+  var canvas = document.getElementById('snowCanvas');
+  paper.setup(canvas);
 
-var spokePath;
-var spokeCount = 2 * Math.floor(rng.nextRange(3, 7));
-var i;
-for (i = 0; i < spokeCount; i++) {
-  spokePath = new paper.Path();
-  spokePath.strokeColor = '#d0e8ff';
-  spokePath.strokeWidth = 3;
-  spokePath.add(origin);
-  spokePath.add(origin.add(spoke));
-  spoke.angle += (360 / spokeCount);
-}
+  // Seed the RNG.
+  var rng = new RNG(20);
 
-// Draw the paper to the canvas.
-paper.view.draw();
+  // BEGIN Helper functions ----------------------------------------
+  function drawSpoke (origin, spokeEnd) {
+    var spokePath = new paper.Path();
+    spokePath.strokeColor = '#d0e8ff';
+    spokePath.strokeWidth = 3;
+    spokePath.add(origin);
+    spokePath.add(origin.add(spokeEnd));
+  }
 
+  function drawSnowflake (origin) {
+    var spokeEnd = new paper.Point();
+    spokeEnd.length = SPOKE_LENGTH;
+    spokeEnd.angle = 0;
+
+    var spokeCount = 2 * Math.floor(rng.nextRange(3, 7));
+    var i;
+    for (i = 0; i < spokeCount; i++) {
+      drawSpoke(origin, spokeEnd);
+      spokeEnd.angle += (360 / spokeCount);
+    }
+  }
+  // END Helper functions ----------------------------------------
+
+  // Draw the snowflake.
+  var origin = new paper.Point(250, 120);
+  drawSnowflake(origin);
+
+  // Draw the paper to the canvas.
+  paper.view.draw();
 };
 
-$(document).ready(makeSnowflake);
+$(document).ready(drawScene);
+
+})();
+
