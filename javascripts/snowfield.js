@@ -50,15 +50,9 @@ function drawScene () {
   function drawSpoke (origin, spokeEnd, crossParams) {
     var spokePath = new paper.Path();
     spokePath.strokeColor = '#d0e8ff';
-    spokePath.strokeWidth = 3;
+    spokePath.strokeWidth = 2;
     spokePath.add(origin);
     spokePath.add(origin.add(spokeEnd));
-
-    var crossStartDist = rng.nextFloatRange(0.8, 1);
-    var crossEndDist = rng.nextFloatRange(0.05, 0.2);
-    var crossSpacingFactor = rng.nextFloatRange(0.6, 0.9);
-    var crossSpikinessFactor = rng.nextFloatRange(0.6, 1.3);
-    var crossAngle = rng.nextRange(10, 45);
 
     var c;
     for (
@@ -74,14 +68,33 @@ function drawScene () {
       var crossTurnwise = crossPoint.clone();
       crossTurnwise.angle += crossParams.spreadAngle;
       crossTurnwise.length *= crossParams.spikinessFactor;
+      var crossBase = crossPoint.clone();
+      crossBase.length *= crossParams.spikeBreadthFactor;
 
       var crossPath = new paper.Path();
       crossPath.strokeColor = '#d0e8ff';
-      crossPath.strokeWidth = 2;
-      crossPath.add(origin.add(crossWiddershins));
+      crossPath.strokeWidth = 1;
+      crossPath.fillColor = '#c0e0ff';
+      crossPath.fillColor.alpha = 0.5;
+      crossPath.closed = true;
       crossPath.add(origin.add(crossPoint));
+      crossPath.add(origin.add(crossWiddershins));
+      crossPath.add(origin.add(crossBase));
       crossPath.add(origin.add(crossTurnwise));
     }
+  }
+
+  // Bell curve
+  function bell(start, end) {
+    return (rng.nextFloatRange(start, end) + rng.nextFloatRange(start, end)) / 2;
+  }
+
+  // Reverse bell curve
+  function reverseBell(start, end) {
+    var halfWay = (start + end) / 2;
+    var raw = halfWay - bell(start, end);
+    var result = (raw > 0) ? (start + raw) : (end + raw);
+    return result;
   }
 
   function drawSnowflake (origin) {
@@ -89,13 +102,14 @@ function drawScene () {
     spokeEnd.length = SPOKE_LENGTH;
     spokeEnd.angle = 0;
 
-    var spokeCount = 2 * Math.floor(rng.nextRange(3, 7));
+    var spokeCount = 2 * Math.floor(rng.nextRange(3, 8));
     var crossParams = {
-      startDist: rng.nextFloatRange(0.8, 1),
+      startDist: 1 - Math.pow(rng.nextFloatRange(0, 0.2), 2),
       endDist: rng.nextFloatRange(0.05, 0.2),
       spacingFactor: rng.nextFloatRange(0.6, 0.9),
-      spikinessFactor: rng.nextFloatRange(0.6, 1.3),
-      spreadAngle: rng.nextRange(10, 35)
+      spikeBreadthFactor: rng.nextFloatRange(0.8, 1.0),
+      spikinessFactor: reverseBell(0.6, 1.3),
+      spreadAngle: bell(10, 45)
     };
 
     var i;
